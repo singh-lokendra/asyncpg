@@ -650,7 +650,23 @@ cdef _textarray_decode(ConnectionSettings settings,
             # for the element type.
             pgproto.as_pg_string_and_size(
                 settings, item_text, &pg_item_str, &pg_item_len)
-            frb_init(&item_buf, pg_item_str, pg_item_len)
+
+            # Handle empty strings safely - if pg_item_len is 0,
+            # pg_item_str might be NULL or invalid
+            if pg_item_len == 0:
+                # For empty strings, create a minimal valid buffer
+                frb_init(&item_buf, <const char*>"", 0)
+            else:
+    
+            # Handle the case where pg_item_str might be NULL or invalid
+            # for empty strings. This prevents segfaults when decoding
+            # arrays containing empty string elements.
+            if pg_item_len == 0 or pg_item_str == NULL:
+                # For empty strings, create a valid empty buffer
+                frb_init(&item_buf, <const char*>"", 0)
+            else:
+                frb_init(&item_buf, pg_item_str, pg_item_len)
+
             item = decoder(settings, &item_buf, decoder_arg)
 
         # Place the decoded element in the array.
