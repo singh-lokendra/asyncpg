@@ -1801,6 +1801,11 @@ class TestCodecs(tb.ConnectedTestCase):
                 ['  a', '  b'],
                 ['"a', r'\""'],
                 [['"a', r'\""'], [',', '",']],
+                # Test cases for empty strings (regression test for segfault)
+                [''],
+                ['test', ''],
+                ['', 'test'],
+                ['test1', '', 'test2'],
             ]
 
             for case in cases:
