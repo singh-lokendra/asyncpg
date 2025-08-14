@@ -651,13 +651,6 @@ cdef _textarray_decode(ConnectionSettings settings,
             pgproto.as_pg_string_and_size(
                 settings, item_text, &pg_item_str, &pg_item_len)
 
-            # Handle empty strings safely - if pg_item_len is 0,
-            # pg_item_str might be NULL or invalid
-            if pg_item_len == 0:
-                # For empty strings, create a minimal valid buffer
-                frb_init(&item_buf, <const char*>"", 0)
-            else:
-    
             # Handle the case where pg_item_str might be NULL or invalid
             # for empty strings. This prevents segfaults when decoding
             # arrays containing empty string elements.
